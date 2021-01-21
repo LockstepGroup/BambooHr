@@ -31,6 +31,28 @@ Class BambooHrServer {
     ########################################################################
     #endregion getApiUrl
 
+    #region createQueryString
+    ########################################################################
+
+    [string] createQueryString ([hashtable]$hashTable) {
+        $QueryString = [System.Web.httputility]::ParseQueryString("")
+
+        foreach ($Pair in $hashTable.GetEnumerator()) {
+            switch ($Pair.Value.GetType().Name) {
+                'DateTime' {
+                    $Pair.Value = Get-Date -Date $Pair.Value -Format yyyy-MM-dd
+                }
+            }
+
+            $QueryString[$($Pair.Name)] = $($Pair.Value)
+        }
+
+        return ("?" + $QueryString.ToString())
+    }
+
+    ########################################################################
+    #endregion createQueryString
+
     #region processQueryResult
     ########################################################################
 
@@ -44,11 +66,12 @@ Class BambooHrServer {
     #region invokeApiQuery
     ########################################################################
 
-    [psobject] invokeApiQuery([string]$method) {
+    [psobject] invokeApiQuery([hashtable]$queryString, [string]$method) {
         $url = $this.getApiUrl()
 
         # tracking
         $this.UrlHistory += $url
+        $this.QueryHistory += $queryString
 
         # bamboo uses basic auth so we need to create a credential object
         # username: your apikey ($this.ApiKey)
@@ -60,6 +83,7 @@ Class BambooHrServer {
         try {
             $QueryParams = @{}
             $QueryParams.Uri = $url
+            $QueryParams.Uri += $this.createQueryString($queryString)
             <# switch ($method) {
                 'PUT' {
                     $QueryParams.Uri += $this.createQueryString($queryString)

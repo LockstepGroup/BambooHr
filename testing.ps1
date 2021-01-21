@@ -5,3 +5,6 @@ $ThisModulePath = Join-Path (Resolve-Path ./) (Split-Path (Resolve-Path ./) -Lea
 ipmo $ThisModulePath -Force
 
 Connect-BambooHrServer
+
+$Employees = Get-BambooHrEmployee
+$TimeOffRequests = Get-BambooHrTimeOffRequest
