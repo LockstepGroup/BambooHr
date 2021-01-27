@@ -1,6 +1,6 @@
 Class BambooHrTimeOffDate {
     [datetime]$Date
-    [int]$Amount
+    [decimal]$Amount
 
     #region Initiators
     ########################################################################
